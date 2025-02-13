@@ -63,7 +63,7 @@ class FilterByType extends StatelessWidget {
                                       const EdgeInsets.fromLTRB(80, 20, 18, 16),
                                   child: Align(
                                     alignment: AlignmentDirectional.bottomEnd,
-                                    child: Container(
+                                    child: SizedBox(
                                       // decoration: BoxDecoration(
                                       //   border: Border.all(
                                       //     color: Colors.black,

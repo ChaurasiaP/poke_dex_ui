@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -31,7 +32,7 @@ class _PokedexHomeState extends State<PokedexHome> {
       try {
         await dataProvider.fetchPokemonList();
       } catch (e) {
-        print('Failed to fetch Pokémon list: $e');
+        log('Failed to fetch Pokémon list: $e');
       }
     });
 
@@ -70,7 +71,7 @@ class _PokedexHomeState extends State<PokedexHome> {
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => FilterByType(),
+                                builder: (context) =>const  FilterByType(),
                               ),
                             );
                           },
@@ -129,7 +130,7 @@ class _PokedexHomeState extends State<PokedexHome> {
                                       ),
                                       Padding(
                                         padding:
-                                            EdgeInsets.fromLTRB(16, 12, 16, 16),
+                                           const  EdgeInsets.fromLTRB(16, 12, 16, 16),
                                         child: Text(
                                           dataProvider.pokemonList[index].name!
                                               .toCapitalized,
@@ -170,7 +171,7 @@ class _PokedexHomeState extends State<PokedexHome> {
                                         bottom: 2,
                                         left: -6,
                                         child: Padding(
-                                          padding: EdgeInsets.fromLTRB(
+                                          padding:const  EdgeInsets.fromLTRB(
                                               16, 12, 16, 16),
                                           child: Text(dataProvider
                                               .pokemonList[index]
@@ -212,7 +213,7 @@ class _PokedexHomeState extends State<PokedexHome> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
                             blurRadius: 10,
-                            offset: Offset(0, 10),
+                            offset:const  Offset(0, 10),
                           ),
                         ],
                       ),
@@ -222,18 +223,18 @@ class _PokedexHomeState extends State<PokedexHome> {
                           Text(
                             dataProvider.pokemonList[_focusedIndex!].name!
                                 .toCapitalized,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           SvgPicture.network(
                             'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${_focusedIndex! + 1}.svg',
                             height: 120,
                             width: 120,
                             placeholderBuilder: (BuildContext context) =>
-                                Center(
+                                const Center(
                               child: RotatingPokeball(),
                             ),
                           ),
@@ -247,11 +248,11 @@ class _PokedexHomeState extends State<PokedexHome> {
                           //   errorWidget: (context, url, error) =>
                           //       Icon(Icons.error),
                           // ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Text(
                             "Ability: ${dataProvider.pokemonList[_focusedIndex!].abilities[0].name!.toCapitalized}",
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.push(
@@ -264,16 +265,16 @@ class _PokedexHomeState extends State<PokedexHome> {
                                 ),
                               );
                             },
-                            child: Text('View Details'),
+                            child:const Text('View Details'),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
                                 _focusedIndex = null;
                               });
                             },
-                            child: Text('Close'),
+                            child:const  Text('Close'),
                           ),
                         ],
                       ),

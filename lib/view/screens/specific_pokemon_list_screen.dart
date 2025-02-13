@@ -118,7 +118,7 @@ class PokemonTypeScreen extends StatelessWidget {
                                 bottom: 2,
                                 left: -6,
                                 child: Padding(
-                                  padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
+                                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                                   child: Text(pokemonTypeList[index]
                                       .abilities[0]
                                       .name!
