@@ -44,7 +44,7 @@ app.*.map.json
 
 
 #project files/folders here
-/lib/api/
+/lib/api/json
 /assets
 /linux
 /windows
