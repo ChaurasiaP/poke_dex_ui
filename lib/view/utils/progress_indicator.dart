@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:poke_dex/view/assets/pokedex_assets.dart';
 
 class RotatingPokeball extends StatefulWidget {
+  const RotatingPokeball({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _RotatingPokeballState createState() => _RotatingPokeballState();
 }
 

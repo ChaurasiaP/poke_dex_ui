@@ -1,9 +1,8 @@
 import 'dart:developer';
-
+import 'package:poke_dex/view/assets/pokedex_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:poke_dex/api/api.dart';
 import 'package:poke_dex/model/pokemon_data_model.dart';
-import 'package:poke_dex/model/pokemons_list_model.dart';
 
 class PokemonProvider extends ChangeNotifier {
   List<Pokemon> pokemonList = [];
@@ -24,8 +23,11 @@ class PokemonProvider extends ChangeNotifier {
       var data = await Api.fetchPokemonList();
 
       if (data != null) {
-
         pokemonList.addAll(data.results);
+
+        if (pokemonList.isNotEmpty) {
+          fetchUniquePokemonTypes();
+        }
 
         // if(data.sprites.other.home.frontSDefault.isNotEmpty){
         //   pokeImgsList.add(data.sprites.other.home);
@@ -41,7 +43,7 @@ class PokemonProvider extends ChangeNotifier {
     }
   }
 
-    // Method to fetch the Pokemon list
+  // Method to fetch the Pokemon list
   Future<void> fetchPokemonData(String pokeId) async {
     _isLoading = true;
     notifyListeners();
@@ -60,4 +62,65 @@ class PokemonProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  List<String> pokemonTypes = [];
+
+  fetchUniquePokemonTypes() {
+    try {
+      pokemonTypes.clear();
+
+      for (var i in pokemonList) {
+        for (var type in i.types) {
+          if (pokemonTypes.contains(type.type)) {
+          } else {
+            pokemonTypes.add(type.type);
+          }
+        }
+      }
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  String getTypeAsset(String type) {
+  switch (type) {
+    case "fire":
+      return PokedexAssets.fireType;
+    case "water":
+      return PokedexAssets.waterType;
+    case "grass":
+      return PokedexAssets.grassType;
+    case "electric":
+      return PokedexAssets.electricType;
+    case "ice":
+      return PokedexAssets.iceType;
+    case "fighting":
+      return PokedexAssets.fightingType;
+    case "poison":
+      return PokedexAssets.poisonType;
+    case "ground":
+      return PokedexAssets.groundType;
+    case "flying":
+      return PokedexAssets.flyingType;
+    case "psychic":
+      return PokedexAssets.psychicType;
+    case "bug":
+      return PokedexAssets.bugType;
+    case "rock":
+      return PokedexAssets.rockType;
+    case "ghost":
+      return PokedexAssets.ghostType;
+    case "dragon":
+      return PokedexAssets.dragonType;
+    case "dark":
+      return PokedexAssets.darkType;
+    case "steel":
+      return PokedexAssets.steelType;
+    case "fairy":
+      return PokedexAssets.fairyType;
+    default:
+      return PokedexAssets.normalType;
+  }
+}
+
 }
