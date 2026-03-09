@@ -61,8 +61,9 @@ class _PokedexHomeState extends State<PokedexHome> {
     final filtered = _searchQuery.isEmpty
         ? dataProvider.pokemonList
         : dataProvider.pokemonList
-            .where((p) =>
-                (p.name ?? '').toLowerCase().contains(_searchQuery.toLowerCase()))
+            .where((p) => (p.name ?? '')
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()))
             .toList();
 
     return Scaffold(
@@ -193,8 +194,7 @@ class _PokedexHomeState extends State<PokedexHome> {
                                   Icon(
                                     Icons.search_off_rounded,
                                     size: 60,
-                                    color:
-                                        Colors.white.withValues(alpha: 0.3),
+                                    color: Colors.white.withValues(alpha: 0.3),
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
@@ -209,8 +209,8 @@ class _PokedexHomeState extends State<PokedexHome> {
                               ),
                             )
                           : GridView.builder(
-                              padding: const EdgeInsets.fromLTRB(
-                                  16, 0, 16, 120),
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 0, 16, 120),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
@@ -223,9 +223,8 @@ class _PokedexHomeState extends State<PokedexHome> {
                                 final pokemon = filtered[index];
                                 final realIndex =
                                     dataProvider.pokemonList.indexOf(pokemon);
-                                final typeColor =
-                                    colorProvider.getColorForType(
-                                        pokemon.types.first.type);
+                                final typeColor = colorProvider
+                                    .getColorForType(pokemon.types.first.type);
                                 return GestureDetector(
                                   onLongPress: () {
                                     setState(() {
@@ -278,8 +277,7 @@ class _PokedexHomeState extends State<PokedexHome> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => PokemonDetailsScreen(
-                              pokemonData:
-                                  dataProvider.pokemonList[idx],
+                              pokemonData: dataProvider.pokemonList[idx],
                               pokemonIndex: idx,
                             ),
                           ),
@@ -362,7 +360,7 @@ class _PokemonCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  pokemon.name?.toCapitalized ?? '',
+                  pokemon.name.toString().toCapitalized,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -384,7 +382,7 @@ class _PokemonCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            t.type.toCapitalized,
+                            t.type,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 9,
@@ -479,7 +477,7 @@ class _QuickView extends StatelessWidget {
             ),
           ),
           Text(
-            pokemon.name?.toCapitalized ?? '',
+            pokemon.name.toString().toCapitalized ?? '',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 26,
@@ -494,7 +492,7 @@ class _QuickView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Ability: ${pokemon.abilities[0].name?.toCapitalized ?? ''}',
+            'Ability: ${pokemon.abilities[0].name.toString().toCapitalized ?? ''}',
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.85),
               fontSize: 14,
@@ -507,8 +505,8 @@ class _QuickView extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: onClose,
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.5)),
+                    side:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.5)),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
