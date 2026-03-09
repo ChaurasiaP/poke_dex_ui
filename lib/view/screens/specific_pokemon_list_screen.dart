@@ -19,110 +19,199 @@ class PokemonTypeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorProvider = Provider.of<ColorProvider>(context);
+    final typeColor = colorProvider.getColorForType(pokemonType);
+
     return Scaffold(
-      backgroundColor: colorProvider.getColorForType(pokemonType),
+      backgroundColor: const Color(0xFF0D0D1A),
       body: Stack(
         children: [
-          GestureDetector(
-            onTap: () {
-              // _focusedIndex = -1;
-              // setState(() {});
-            },
+          // Gradient bg with type colour splash
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  typeColor.withValues(alpha: 0.55),
+                  const Color(0xFF0D0D1A),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: const [0.0, 0.45],
+              ),
+            ),
+          ),
+          SafeArea(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // App bar
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 45, 16, 12),
-                  child: Image.asset(PokedexAssets.bannerImg),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.30),
+                            ),
+                          ),
+                          child: const Icon(Icons.arrow_back_ios_rounded,
+                              color: Colors.white, size: 18),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${pokemonType.toCapitalized} Type',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            '${pokemonTypeList.length} Pokémon',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.55),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
+
+                const SizedBox(height: 8),
+
                 Expanded(
                   child: GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 1.4,
-                      mainAxisSpacing: 6,
-                      crossAxisSpacing: 8,
+                      childAspectRatio: 1.35,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
                     ),
                     itemCount: pokemonTypeList.length,
                     itemBuilder: (context, index) {
+                      final pokemon = pokemonTypeList[index];
                       return GestureDetector(
-                        onLongPress: () {
-                          // setState(() {
-                          //   _focusedIndex = index;
-                          // });
-                        },
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => PokemonDetailsScreen(
-                                pokemonData: pokemonTypeList[index],
+                                pokemonData: pokemon,
+                                pokemonIndex: pokemon.id != null
+                                    ? pokemon.id! - 1
+                                    : index,
                               ),
                             ),
                           );
                         },
-                        child: Card(
-                          color: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                typeColor.withValues(alpha: 0.75),
+                                typeColor.withValues(alpha: 0.40),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.18),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: typeColor.withValues(alpha: 0.30),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
                           child: Stack(
                             children: [
                               Positioned(
-                                right: -25,
-                                bottom: -30,
-                                child: Transform.rotate(
-                                  angle: 6,
+                                right: -18,
+                                bottom: -18,
+                                child: Opacity(
+                                  opacity: 0.12,
                                   child: Image.asset(
-                                    scale: 1.4,
                                     PokedexAssets.pokeball,
-                                    color: Colors.grey.shade300,
+                                    height: 80,
                                   ),
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                                child: Text(
-                                  pokemonTypeList[index].name!.toCapitalized,
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '#${pokemon.id.toString().padLeft(3, '0')}',
+                                      style: TextStyle(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.60),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      pokemon.name?.toCapitalized ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      pokemon.abilities.isNotEmpty
+                                          ? pokemon.abilities[0].name
+                                                  ?.toCapitalized ??
+                                              ''
+                                          : '',
+                                      style: TextStyle(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.65),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Positioned(
-                                bottom: 0,
-                                right: 5,
+                                right: 6,
+                                bottom: 4,
                                 child: CachedNetworkImage(
-                                    placeholder: (context, string) {
-                                      return Image.asset(
-                                        PokedexAssets.coloredPokeball,
-                                        scale: 10,
-                                      );
-                                    },
-                                    errorWidget: (context, url, error) {
-                                      return Image.asset(
-                                        PokedexAssets.coloredPokeball,
-                                        height: 80,
-                                        width: 80,
-                                      );
-                                    },
-                                    fit: BoxFit.contain,
-                                    scale: 5,
-                                    imageUrl:
-                                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonTypeList[index].id!}.png'),
-                              ),
-                              const Positioned(
-                                bottom: 16,
-                                left: -6,
-                                child: Padding(
-                                  padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-                                  child: Text("Ability: "),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 2,
-                                left: -6,
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                                  child: Text(pokemonTypeList[index]
-                                      .abilities[0]
-                                      .name!
-                                      .toCapitalized),
+                                  imageUrl:
+                                      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png',
+                                  height: 72,
+                                  width: 72,
+                                  fit: BoxFit.contain,
+                                  placeholder: (_, __) => Image.asset(
+                                    PokedexAssets.coloredPokeball,
+                                    height: 30,
+                                  ),
+                                  errorWidget: (_, __, ___) => Image.asset(
+                                    PokedexAssets.coloredPokeball,
+                                    height: 40,
+                                  ),
                                 ),
                               ),
                             ],
