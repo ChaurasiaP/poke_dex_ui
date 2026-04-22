@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:poke_dex/model/team_model.dart';
+import 'package:poke_dex/model/api_models/team_model.dart';
 import 'package:poke_dex/providers/color_provider.dart';
 import 'package:poke_dex/providers/data_provider.dart';
 import 'package:poke_dex/view/assets/pokedex_assets.dart';
@@ -13,7 +13,7 @@ class TeamScreen extends StatelessWidget {
 
   void _showEditNicknameDialog(
     BuildContext context,
-    TeamEntry entry,
+    ApiTeamEntry entry,
     PokemonProvider provider,
   ) {
     final controller = TextEditingController(text: entry.nickname);
@@ -23,7 +23,7 @@ class TeamScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF1E1E30),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Rename ${entry.pokemon.name?.toCapitalized}',
+          'Rename ${entry.name.toCapitalized}',
           style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         content: TextField(
@@ -55,8 +55,8 @@ class TeamScreen extends StatelessWidget {
             ),
             onPressed: () async {
               final nick = controller.text.trim();
-              if (nick.isNotEmpty && entry.pokemon.id != null) {
-                await provider.updateTeamNickname(entry.pokemon.id!, nick);
+              if (nick.isNotEmpty) {
+                await provider.updateTeamNickname(entry.pokemonId, nick);
               }
               if (ctx.mounted) Navigator.pop(ctx);
             },
@@ -167,25 +167,28 @@ class TeamScreen extends StatelessWidget {
                           itemCount: provider.team.length,
                           itemBuilder: (context, index) {
                             final entry = provider.team[index];
-                            final pokemon = entry.pokemon;
-                            final typeColor = colorProvider
-                                .getColorForType(pokemon.types.first.type);
+                            final typeColor = entry.types.isNotEmpty
+                                ? colorProvider.getColorForType(entry.types.first.type)
+                                : Colors.grey;
                             final pokemonIndex = provider.pokemonList
-                                .indexWhere((p) => p.id == pokemon.id);
+                                .indexWhere((p) => p.id == entry.pokemonId);
+                            final pokemon = pokemonIndex >= 0
+                                ? provider.pokemonList[pokemonIndex]
+                                : null;
 
                             return GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PokemonDetailsScreen(
-                                      pokemonData: pokemon,
-                                      pokemonIndex: pokemonIndex >= 0
-                                          ? pokemonIndex
-                                          : 0,
+                                if (pokemon != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => PokemonDetailsScreen(
+                                        pokemonData: pokemon,
+                                        pokemonIndex: pokemonIndex,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               },
                               onLongPress: () => _showEditNicknameDialog(
                                   context, entry, provider),
@@ -231,27 +234,23 @@ class TeamScreen extends StatelessWidget {
                                       right: 8,
                                       child: GestureDetector(
                                         onTap: () async {
-                                          if (pokemon.id != null) {
-                                            await provider
-                                                .removeFromTeam(pokemon.id!);
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      '${entry.nickname} removed from team'),
-                                                  backgroundColor:
-                                                      const Color(0xFF1E1E2E),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            14),
-                                                  ),
+                                          await provider.removeFromTeam(entry.pokemonId);
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    '${entry.nickname} removed from team'),
+                                                backgroundColor:
+                                                    const Color(0xFF1E1E2E),
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
                                                 ),
-                                              );
-                                            }
+                                              ),
+                                            );
                                           }
                                         },
                                         child: Container(
@@ -280,8 +279,8 @@ class TeamScreen extends StatelessWidget {
                                           Expanded(
                                             child: Center(
                                               child: CachedNetworkImage(
-                                                imageUrl:
-                                                    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonIndex >= 0 ? pokemonIndex + 1 : pokemon.id}.png',
+                                                imageUrl: entry.frontSprite ??
+                                                    'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${entry.pokemonId}.png',
                                                 fit: BoxFit.contain,
                                                 placeholder: (_, __) =>
                                                     Image.asset(
@@ -308,9 +307,9 @@ class TeamScreen extends StatelessWidget {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           if (entry.nickname.toLowerCase() !=
-                                              (pokemon.name ?? '').toLowerCase())
+                                              entry.name.toLowerCase())
                                             Text(
-                                              pokemon.name?.toCapitalized ?? '',
+                                              entry.name.toCapitalized,
                                               style: TextStyle(
                                                 color: Colors.white
                                                     .withValues(alpha: 0.55),

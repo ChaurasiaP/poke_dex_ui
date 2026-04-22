@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:poke_dex/model/pokemon_data_model.dart';
 import 'package:poke_dex/providers/color_provider.dart';
 import 'package:poke_dex/providers/data_provider.dart';
 import 'package:poke_dex/view/screens/pokemon_details_screen.dart';
@@ -111,15 +108,18 @@ class FavouritesScreen extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                           itemCount: provider.favourites.length,
                           itemBuilder: (context, index) {
-                            final entry = provider.favourites[index];
-                            final pokemon = entry.pokemon;
-                            final typeColor = colorProvider
-                                .getColorForType(pokemon.types.first.type);
+                            final item = provider.favourites[index];
+                            final typeColor = item.types.isNotEmpty
+                                ? colorProvider.getColorForType(item.types.first.type)
+                                : Colors.grey;
                             final pokemonIndex = provider.pokemonList
-                                .indexWhere((p) => p.id == pokemon.id);
+                                .indexWhere((p) => p.id == item.pokemonId);
+                            final pokemon = pokemonIndex >= 0
+                                ? provider.pokemonList[pokemonIndex]
+                                : null;
 
                             return Dismissible(
-                              key: ValueKey(pokemon.id),
+                              key: ValueKey(item.pokemonId),
                               direction: DismissDirection.endToStart,
                               background: Container(
                                 alignment: Alignment.centerRight,
@@ -134,17 +134,16 @@ class FavouritesScreen extends StatelessWidget {
                                     color: Colors.white, size: 26),
                               ),
                               onDismissed: (_) async {
-                                await provider
-                                    .removeFavourite(pokemon.id!);
+                                await provider.removeFavourite(item.pokemonId);
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                          '${pokemon.name?.toCapitalized} removed from favourites'),
+                                          '${item.name.toCapitalized} removed from favourites'),
                                       action: SnackBarAction(
                                         label: 'Undo',
                                         onPressed: () => provider
-                                            .addFavourite(pokemon),
+                                            .addFavourite(item.pokemonId),
                                       ),
                                       backgroundColor:
                                           const Color(0xFF1E1E2E),
@@ -159,17 +158,17 @@ class FavouritesScreen extends StatelessWidget {
                               },
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => PokemonDetailsScreen(
-                                        pokemonData: pokemon,
-                                        pokemonIndex: pokemonIndex >= 0
-                                            ? pokemonIndex
-                                            : 0,
+                                  if (pokemon != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => PokemonDetailsScreen(
+                                          pokemonData: pokemon,
+                                          pokemonIndex: pokemonIndex,
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 },
                                 child: Container(
                                   margin: const EdgeInsets.only(bottom: 12),
@@ -193,8 +192,8 @@ class FavouritesScreen extends StatelessWidget {
                                         const EdgeInsets.symmetric(
                                             horizontal: 16, vertical: 8),
                                     leading: CachedNetworkImage(
-                                      imageUrl:
-                                          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonIndex >= 0 ? pokemonIndex + 1 : pokemon.id}.png',
+                                      imageUrl: item.frontSprite ??
+                                          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${item.pokemonId}.png',
                                       height: 55,
                                       width: 55,
                                       fit: BoxFit.contain,
@@ -208,7 +207,7 @@ class FavouritesScreen extends StatelessWidget {
                                       ),
                                     ),
                                     title: Text(
-                                      pokemon.name?.toCapitalized ?? '',
+                                      item.name.toCapitalized,
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
@@ -217,7 +216,7 @@ class FavouritesScreen extends StatelessWidget {
                                     ),
                                     subtitle: Wrap(
                                       spacing: 4,
-                                      children: pokemon.types
+                                      children: item.types
                                           .map<Widget>(
                                             (t) => Container(
                                               margin:

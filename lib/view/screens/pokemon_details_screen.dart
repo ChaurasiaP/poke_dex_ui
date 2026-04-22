@@ -111,7 +111,7 @@ class _PokemonDetailsScreenState extends State<PokemonDetailsScreen>
               Navigator.pop(ctx);
               final nick = nicknameController.text.trim();
               final result = await provider.addToTeam(
-                widget.pokemonData,
+                widget.pokemonData.id!,
                 nickname: nick.isNotEmpty ? nick : null,
               );
               if (context.mounted) {
@@ -212,7 +212,7 @@ class _PokemonDetailsScreenState extends State<PokemonDetailsScreen>
                           if (isFav) {
                             await provider.removeFavourite(pokemon.id!);
                           } else {
-                            await provider.addFavourite(pokemon);
+                            await provider.addFavourite(pokemon.id!);
                           }
                         },
                         child: Container(
@@ -483,7 +483,7 @@ class _PokemonDetailsScreenState extends State<PokemonDetailsScreen>
                                                             pokemon.id!);
                                                   } else {
                                                     await provider
-                                                        .addFavourite(pokemon);
+                                                        .addFavourite(pokemon.id!);
                                                   }
                                                 },
                                                 child: AnimatedContainer(

@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Pok\xE9dex FastAPI Backend\nSAM Template for deploying FastAPI app to\
+  \ AWS Lambda\n"
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.12
+    Architectures:
+    - x86_64
+Resources:
+  PokedexApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: PokedexApiFunction
+      Handler: app.main.handler
+      Environment:
+        Variables:
+          DB_HOST: pokedex-db.czwqmy26wn85.ap-south-1.rds.amazonaws.com
+          DB_PORT: '5432'
+          DB_NAME: pokedex
+          DB_USER: postgres
+          DB_PASSWORD: PokedexPassword123!
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        RootApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+    Metadata:
+      SamResourceId: PokedexApiFunction
+Outputs:
+  PokedexApiUrl:
+    Description: API Gateway endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  PokedexApiFunction:
+    Description: Pokedex FastAPI Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - PokedexApiFunction
+      - Arn
